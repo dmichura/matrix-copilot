@@ -3,34 +3,45 @@
 #include <algorithm>
 #include <stdexcept>
 
-Matrix::Matrix() noexcept
-    : rows_(0), cols_(0), size_(0), data_(nullptr) {}
+matrix::matrix() noexcept
+    : rows(0), cols(0), data(nullptr) {}
 
-Matrix::Matrix(size_type rows, size_type cols, double value)
-    : rows_(rows), cols_(cols), size_(rows * cols), data_(nullptr)
+matrix::matrix(size_type rows, size_type cols, double value)
+    : rows(rows), cols(cols), data(nullptr)
 {
-    alokuj(size_);
-    std::fill(data_.get(), data_.get() + size_, value);
+    alokuj(rows * cols);
+    std::fill(data[0], data[0] + rows * cols, value);
 }
 
-Matrix::Matrix(std::initializer_list<std::initializer_list<double>> init)
-    : rows_(init.size()), cols_(init.size() ? init.begin()->size() : 0), size_(rows_ * cols_), data_(nullptr)
+matrix::matrix(std::initializer_list<std::initializer_list<double>> init)
+    : rows(init.size()), cols(init.size() ? init.begin()->size() : 0), data(nullptr)
 {
-    alokuj(size_);
+    if (rows == 0 || cols == 0) {
+        return;
+    }
+    
+    alokuj(rows * cols);
     size_type i = 0;
     for (const auto& row : init) {
-        if (row.size() != cols_)
+        if (row.size() != cols)
             throw std::invalid_argument("Inconsistent row sizes in initializer_list");
-        for (double v : row)
-            data_[i++] = v;
+        for (double v : row) {
+            data[i / cols][i % cols] = v;
+            i++;
+        }
     }
 }
 
-void Matrix::alokuj(size_type n) {
-    if (!data_ || size_ < n) {
-        data_.reset();
-        data_ = std::make_unique<double[]>(n);
-        size_ = n;
+void matrix::alokuj(size_type n) {
+    if (data != nullptr) {
+        for (size_type i = 0; i < rows; ++i) {
+            delete[] data[i];
+        }
+        delete[] data;
     }
-    // Jeśli zaalokowany rozmiar >= n, nie robimy nic
+    
+    data = new double*[rows];
+    for (size_type i = 0; i < rows; ++i) {
+        data[i] = new double[cols];
+    }
 }
