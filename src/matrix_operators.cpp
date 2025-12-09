@@ -1,8 +1,11 @@
-#include "matrix.h"
+#include "../include/matrix.h"
 #include <cmath>
+#include <stdexcept>
 
 // Dodawanie macierzy A+B
 matrix& matrix::operator+(matrix& m) {
+    if (rows != m.rows || cols != m.cols)
+        throw std::runtime_error("Nieprawidłowe wymiary dla dodawania");
     matrix* result = new matrix(rows, cols);
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < cols; j++) {
@@ -14,6 +17,8 @@ matrix& matrix::operator+(matrix& m) {
 
 // Mnożenie macierzy A*B
 matrix& matrix::operator*(matrix& m) {
+    if (cols != m.rows)
+        throw std::runtime_error("Nieprawidłowe wymiary dla mnożenia");
     matrix* result = new matrix(rows, m.cols);
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < m.cols; j++) {
