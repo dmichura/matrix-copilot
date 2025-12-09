@@ -64,6 +64,21 @@ public:
     bool operator>(const matrix& m);
     bool operator<(const matrix& m);
 
+    // Metody utility
+    matrix& wstaw(int x, int y, int wartosc);
+    int pokaz(int x, int y);
+    matrix& dowroc();
+    matrix& losuj();
+    matrix& losuj(int x);
+    matrix& diagonalna(int* t);
+    matrix& diagonalna_k(int k, int* t);
+    matrix& kolumna(int x, int* t);
+    matrix& wiersz(int y, int* t);
+    matrix& przekatna();
+    matrix& pod_przekatna();
+    matrix& nad_przekatna();
+    matrix& szachownica();
+
     // Publiczne dla friend funkcji
     int rows, cols;
     double** data;
