@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include "../include/matrix.h"
 #include <memory>
 #include <algorithm>
 #include <stdexcept>
@@ -13,35 +13,32 @@ matrix::matrix(size_type rows, size_type cols, double value)
     std::fill(data[0], data[0] + rows * cols, value);
 }
 
-matrix::matrix(std::initializer_list<std::initializer_list<double>> init)
-    : rows(init.size()), cols(init.size() ? init.begin()->size() : 0), data(nullptr)
-{
-    if (rows == 0 || cols == 0) {
-        return;
-    }
-    
+matrix::matrix(std::initializer_list<std::initializer_list<double>> init) {
+    rows = static_cast<int>(init.size());
+    cols = rows > 0 ? static_cast<int>(init.begin()->size()) : 0;
     alokuj(rows * cols);
-    size_type i = 0;
+    int r = 0;
     for (const auto& row : init) {
-        if (row.size() != cols)
-            throw std::invalid_argument("Inconsistent row sizes in initializer_list");
-        for (double v : row) {
-            data[i / cols][i % cols] = v;
-            i++;
+        if (row.size() != static_cast<size_type>(cols))
+            throw std::runtime_error("Niezgodne długości wierszy w initializer_list");
+        int c = 0;
+        for (double val : row) {
+            data[r][c] = val;
+            ++c;
         }
+        ++r;
     }
 }
 
 void matrix::alokuj(size_type n) {
-    if (data != nullptr) {
-        for (size_type i = 0; i < rows; ++i) {
-            delete[] data[i];
-        }
-        delete[] data;
-    }
-    
+    (void)n; // parametr nieużywany
     data = new double*[rows];
-    for (size_type i = 0; i < rows; ++i) {
+    for (size_type i = 0; i < static_cast<size_type>(rows); ++i) {
         data[i] = new double[cols];
+    }
+    for (size_type i = 0; i < static_cast<size_type>(rows); ++i) {
+        for (size_type j = 0; j < static_cast<size_type>(cols); ++j) {
+            data[i][j] = 0.0;
+        }
     }
 }
