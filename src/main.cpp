@@ -3,7 +3,8 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
-#include "matrix.h"
+#include <algorithm> // min
+#include "../include/matrix.h"
 
 using namespace std;
 
@@ -14,35 +15,37 @@ matrix wczytaj_macierz_z_pliku(const std::string& filename) {
 
     size_t rows, cols;
     fin >> rows >> cols;
-    std::vector<std::vector<double>> temp(rows, std::vector<double>(cols));
-    for (size_t r = 0; r < rows; ++r)
-        for (size_t c = 0; c < cols; ++c)
-            fin >> temp[r][c];
 
-    return matrix(temp);
+    matrix result(rows, cols, 0.0);
+    for (size_t r = 0; r < rows; ++r) {
+        for (size_t c = 0; c < cols; ++c) {
+            fin >> result.data[r][c];
+        }
+    }
+    return result;
 }
 
 // Wypisanie fragmentu macierzy (np. 5x5)
 void wypisz_fragment(const matrix& m, size_t max_rows = 5, size_t max_cols = 5) {
-    size_t rmax = std::min(m.rows, max_rows);
-    size_t cmax = std::min(m.cols, max_cols);
+    size_t rmax = std::min(static_cast<size_t>(m.rows), max_rows);
+    size_t cmax = std::min(static_cast<size_t>(m.cols), max_cols);
     for (size_t r = 0; r < rmax; ++r) {
         std::cout << "[ ";
         for (size_t c = 0; c < cmax; ++c) {
             std::cout << m(r, c) << " ";
         }
-        if (cmax < m.cols) std::cout << "...";
+        if (cmax < static_cast<size_t>(m.cols)) std::cout << "...";
         std::cout << "]\n";
     }
-    if (rmax < m.rows) std::cout << "...\n";
+    if (rmax < static_cast<size_t>(m.rows)) std::cout << "...\n";
 }
 
 int main() {
     try {
         std::cout << "Wczytywanie macierzy A z pliku...\n";
-        matrix A = wczytaj_macierz_z_pliku("input_A.txt");
+        matrix A = wczytaj_macierz_z_pliku("data/input_matrix_A.txt");
         std::cout << "Wczytywanie macierzy B z pliku...\n";
-        matrix B = wczytaj_macierz_z_pliku("input_B.txt");
+        matrix B = wczytaj_macierz_z_pliku("data/input_matrix_B.txt");
 
         std::cout << "\n--- Testowanie A+B ---\n";
         matrix AB = A + B;
@@ -69,14 +72,14 @@ int main() {
         A(0,0) = 123.456;
         std::cout << "A(0,0) po: " << A(0,0) << "\n";
 
-        std::cout << "\n--- Testowanie operator+= ---\n";
+        std::cout << "\n--- Testowanie operator+= (skalarem) ---\n";
         matrix Ap = A;
-        Ap += B;
+        Ap += 3; // dodaj 3 do wszystkich elementów
         wypisz_fragment(Ap);
 
-        std::cout << "\n--- Testowanie operator-= ---\n";
+        std::cout << "\n--- Testowanie operator-= (skalarem) ---\n";
         matrix Am = A;
-        Am -= B;
+        Am -= 2; // odejmij 2 od wszystkich elementów
         wypisz_fragment(Am);
 
         std::cout << "\n--- Testowanie operator*= (skalarem) ---\n";
@@ -84,30 +87,32 @@ int main() {
         As *= 2;
         wypisz_fragment(As);
 
-        std::cout << "\n--- Testowanie inkrementacji ++ ---\n";
+        std::cout << "\n--- Testowanie inkrementacji ++ (postfix) ---\n";
         matrix Aincr = A;
-        ++Aincr;
+        Aincr++;
         wypisz_fragment(Aincr);
 
-        std::cout << "\n--- Testowanie dekrementacji -- ---\n";
+        std::cout << "\n--- Testowanie dekrementacji -- (postfix) ---\n";
         matrix Adecr = A;
-        --Adecr;
+        Adecr--;
         wypisz_fragment(Adecr);
 
         std::cout << "\n--- Testowanie operatora porównania == ---\n";
         std::cout << ((A == B) ? "PRAWDA" : "FAŁSZ") << "\n";
 
         std::cout << "\n--- Testowanie operatora porównania != ---\n";
-        std::cout << ((A != B) ? "PRAWDA" : "FAŁSZ") << "\n";
+        std::cout << ((!(A == B)) ? "PRAWDA" : "FAŁSZ") << "\n";
 
-        // Jeśli masz operator >, <, możesz dodać:
-        // std::cout << "\n--- Testowanie operatora > ---\n";
-        // std::cout << ((A > B) ? "PRAWDA" : "FAŁSZ") << "\n";
+        std::cout << "\n--- Testowanie operatora > ---\n";
+        std::cout << ((A > B) ? "PRAWDA" : "FAŁSZ") << "\n";
+
+        std::cout << "\n--- Testowanie operatora < ---\n";
+        std::cout << ((A < B) ? "PRAWDA" : "FAŁSZ") << "\n";
 
         std::cout << "\n--- Test zabezpieczeń (try-catch) ---\n";
         try {
             matrix C(2, 2, 1.0);
-            matrix wynik = A * C; // powinien rzucić wyjątek
+            matrix wynik = A * C; // jeśli wymiary nie pasują, powinien być wyjątek
             wypisz_fragment(wynik);
         } catch (const std::exception& e) {
             std::cout << "Złapano wyjątek: " << e.what() << "\n";
