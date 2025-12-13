@@ -9,7 +9,15 @@
 
 using namespace std;
 
-// Wczytywanie macierzy z pliku tekstowego
+/// @brief Wczytaj macierz z pliku tekstowego
+/// Funkcja otwiera plik tekstowy i wczytuje wymiary macierzy oraz jej elementy.
+/// Spodziewany format pliku:
+/// - Linia 1: liczba wierszy liczba kolumn
+/// - Nastepne linie: elementy macierzy oddzielone spacjami
+/// 
+/// @param filename Sciezka do pliku zawierajacego dane macierzy
+/// @return Macierz wczytana z pliku
+/// @throw std::runtime_error Jesli plik nie mogl byc otwarty
 matrix wczytaj_macierz_z_pliku(const std::string& filename) {
     std::ifstream fin(filename);
     if (!fin) throw std::runtime_error("Nie można otworzyć pliku: " + filename);
@@ -26,7 +34,13 @@ matrix wczytaj_macierz_z_pliku(const std::string& filename) {
     return result;
 }
 
-// Wypisanie fragmentu macierzy (np. 5x5)
+/// @brief Wypisz fragment macierzy na standardowe wyjscie
+/// Funkcja wyswietla pierwsze max_rows wierszy i max_cols kolumn macierzy.
+/// Jesli macierz jest wieksza, dodaje "..." wskazujace na ukryte elementy.
+/// 
+/// @param m Macierz do wypisania
+/// @param max_rows Maksymalna liczba wierszy do wyswietlenia (domyslnie 5)
+/// @param max_cols Maksymalna liczba kolumn do wyswietlenia (domyslnie 5)
 void wypisz_fragment(const matrix& m, size_t max_rows = 5, size_t max_cols = 5) {
     size_t rmax = std::min(static_cast<size_t>(m.get_rows()), max_rows);
     size_t cmax = std::min(static_cast<size_t>(m.get_cols()), max_cols);
@@ -44,6 +58,13 @@ void wypisz_fragment(const matrix& m, size_t max_rows = 5, size_t max_cols = 5) 
         std::cout << "...\n";
 }
 
+/// @brief Glowna funkcja programu
+/// Program testuje wszystkie operacje i funkcjonalnosci biblioteki matrix.
+/// Wczytuje macierze z plikow, testuje operatory arytmetyczne, porownania
+/// i inne operacje dostepne w klasie matrix. Wyswietla wyniki testow
+/// w formacie czytelnym dla uzytkownika.
+/// 
+/// @return Kod zakonczenia programu (0 = sukces, 1 = blad)
 int main() {
     try {
         std::cout << "=== TESTOWANIE BIBLIOTEKI MATRIX ===\n\n";
