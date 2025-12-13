@@ -6,8 +6,6 @@
 #include <algorithm> // min
 #include "../include/matrix.h"
 
-using namespace std;
-
 // Wczytywanie macierzy z pliku tekstowego
 matrix wczytaj_macierz_z_pliku(const std::string& filename) {
     std::ifstream fin(filename);

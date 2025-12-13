@@ -9,10 +9,8 @@ using namespace std;
 
 class matrix {
 public:
-    using size_type = std::size_t;
-
     matrix() noexcept;
-    matrix(size_type rows, size_type cols, double value = 0.0);
+    matrix(std::size_t rows, std::size_t cols, double value = 0.0);
     matrix(std::initializer_list<std::initializer_list<double>> init);
 
     matrix(const matrix&) = default;
@@ -21,16 +19,16 @@ public:
     matrix& operator=(matrix&&) noexcept = default;
     ~matrix() = default;
 
-    size_type get_rows() const noexcept { return rows; }
-    size_type get_cols() const noexcept { return cols; }
-    size_type size() const noexcept { return rows * cols; }
+    std::size_t get_rows() const noexcept { return rows; }
+    std::size_t get_cols() const noexcept { return cols; }
+    std::size_t size() const noexcept { return rows * cols; }
 
     // Zarządzanie pamięcią
-    void alokuj(size_type n);
+    void alokuj(std::size_t n);
 
     // Dostęp do danych
-    double& operator()(size_type r, size_type c) { return data[r][c]; }
-    double operator()(size_type r, size_type c) const { return data[r][c]; }
+    double& operator()(std::size_t r, std::size_t c) { return data[r][c]; }
+    double operator()(std::size_t r, std::size_t c) const { return data[r][c]; }
 
     // Operatory arytmetyczne
     matrix& operator+(matrix& m);
