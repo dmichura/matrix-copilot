@@ -13,10 +13,16 @@ public:
     matrix(std::size_t rows, std::size_t cols, double value = 0.0);
     matrix(std::initializer_list<std::initializer_list<double>> init);
 
-    matrix(const matrix&) = default;
+    // Konstruktor kopiujący
+    matrix(const matrix& other);
+    // Operator przypisania
+    matrix& operator=(const matrix& other);
+    
+    // Konstruktor przenoszący
     matrix(matrix&&) noexcept = default;
-    matrix& operator=(const matrix&) = default;
+    // Operator przypisania przenoszący
     matrix& operator=(matrix&&) noexcept = default;
+    
     ~matrix() = default;
 
     std::size_t get_rows() const noexcept { return rows; }
@@ -27,8 +33,8 @@ public:
     void alokuj(std::size_t n);
 
     // Dostęp do danych
-    double& operator()(std::size_t r, std::size_t c) { return data[r][c]; }
-    double operator()(std::size_t r, std::size_t c) const { return data[r][c]; }
+    double& operator()(std::size_t r, std::size_t c);
+    double operator()(std::size_t r, std::size_t c) const;
 
     // Operatory arytmetyczne
     matrix& operator+(matrix& m);
@@ -77,9 +83,8 @@ public:
     matrix& nad_przekatna();
     matrix& szachownica();
 
-    // Publiczne dla friend funkcji
     int rows, cols;
-    double** data;
+    std::unique_ptr<double*[]> data;
 
 private:
 };

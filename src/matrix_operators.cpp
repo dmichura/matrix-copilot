@@ -6,20 +6,20 @@
 matrix& matrix::operator+(matrix& m) {
     if (rows != m.rows || cols != m.cols)
         throw std::runtime_error("Nieprawidłowe wymiary dla dodawania");
-    matrix* result = new matrix(rows, cols);
+    auto result = std::make_unique<matrix>(rows, cols);
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < cols; j++) {
             result->data[i][j] = this->data[i][j] + m.data[i][j];
         }
     }
-    return *result;
+    return *result.release();
 }
 
 // Mnożenie macierzy A*B
 matrix& matrix::operator*(matrix& m) {
     if (cols != m.rows)
         throw std::runtime_error("Nieprawidłowe wymiary dla mnożenia");
-    matrix* result = new matrix(rows, m.cols);
+    auto result = std::make_unique<matrix>(rows, m.cols);
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < m.cols; j++) {
             result->data[i][j] = 0;
@@ -28,40 +28,40 @@ matrix& matrix::operator*(matrix& m) {
             }
         }
     }
-    return *result;
+    return *result.release();
 }
 
 // Dodaj 'a' do każdego elementu
 matrix& matrix::operator+(int a) {
-    matrix* result = new matrix(rows, cols);
+    auto result = std::make_unique<matrix>(rows, cols);
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < cols; j++) {
             result->data[i][j] = this->data[i][j] + a;
         }
     }
-    return *result;
+    return *result.release();
 }
 
 // Pomnóż każdy element przez 'a'
 matrix& matrix::operator*(int a) {
-    matrix* result = new matrix(rows, cols);
+    auto result = std::make_unique<matrix>(rows, cols);
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < cols; j++) {
             result->data[i][j] = this->data[i][j] * a;
         }
     }
-    return *result;
+    return *result.release();
 }
 
 // Odejmij 'a' od każdego elementu
 matrix& matrix::operator-(int a) {
-    matrix* result = new matrix(rows, cols);
+    auto result = std::make_unique<matrix>(rows, cols);
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j < cols; j++) {
             result->data[i][j] = this->data[i][j] - a;
         }
     }
-    return *result;
+    return *result.release();
 }
 
 // int + A

@@ -3,8 +3,11 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
-#include <algorithm> // min
+#include <algorithm>
+#include <memory>
 #include "../include/matrix.h"
+
+using namespace std;
 
 // Wczytywanie macierzy z pliku tekstowego
 matrix wczytaj_macierz_z_pliku(const std::string& filename) {
@@ -17,7 +20,7 @@ matrix wczytaj_macierz_z_pliku(const std::string& filename) {
     matrix result(rows, cols, 0.0);
     for (size_t r = 0; r < rows; ++r) {
         for (size_t c = 0; c < cols; ++c) {
-            fin >> result.data[r][c];
+            fin >> result(r, c);
         }
     }
     return result;
@@ -25,33 +28,49 @@ matrix wczytaj_macierz_z_pliku(const std::string& filename) {
 
 // Wypisanie fragmentu macierzy (np. 5x5)
 void wypisz_fragment(const matrix& m, size_t max_rows = 5, size_t max_cols = 5) {
-    size_t rmax = std::min(static_cast<size_t>(m.rows), max_rows);
-    size_t cmax = std::min(static_cast<size_t>(m.cols), max_cols);
+    size_t rmax = std::min(static_cast<size_t>(m.get_rows()), max_rows);
+    size_t cmax = std::min(static_cast<size_t>(m.get_cols()), max_cols);
+    
     for (size_t r = 0; r < rmax; ++r) {
         std::cout << "[ ";
         for (size_t c = 0; c < cmax; ++c) {
             std::cout << m(r, c) << " ";
         }
-        if (cmax < static_cast<size_t>(m.cols)) std::cout << "...";
+        if (cmax < static_cast<size_t>(m.get_cols())) 
+            std::cout << "...";
         std::cout << "]\n";
     }
-    if (rmax < static_cast<size_t>(m.rows)) std::cout << "...\n";
+    if (rmax < static_cast<size_t>(m.get_rows())) 
+        std::cout << "...\n";
 }
 
 int main() {
     try {
+        std::cout << "=== TESTOWANIE BIBLIOTEKI MATRIX ===\n\n";
+
         std::cout << "Wczytywanie macierzy A z pliku...\n";
         matrix A = wczytaj_macierz_z_pliku("data/input_matrix_A.txt");
+        std::cout << "Wymiary A: " << A.get_rows() << "x" << A.get_cols() << "\n\n";
+
         std::cout << "Wczytywanie macierzy B z pliku...\n";
         matrix B = wczytaj_macierz_z_pliku("data/input_matrix_B.txt");
+        std::cout << "Wymiary B: " << B.get_rows() << "x" << B.get_cols() << "\n\n";
 
-        std::cout << "\n--- Testowanie A+B ---\n";
-        matrix AB = A + B;
-        wypisz_fragment(AB);
+        std::cout << "--- Testowanie A+B ---\n";
+        try {
+            matrix AB = A + B;
+            wypisz_fragment(AB);
+        } catch (const std::exception& e) {
+            std::cout << "Błąd: " << e.what() << "\n";
+        }
 
         std::cout << "\n--- Testowanie A*B ---\n";
-        matrix AMB = A * B;
-        wypisz_fragment(AMB);
+        try {
+            matrix AMB = A * B;
+            wypisz_fragment(AMB);
+        } catch (const std::exception& e) {
+            std::cout << "Błąd: " << e.what() << "\n";
+        }
 
         std::cout << "\n--- Testowanie A+10 ---\n";
         matrix Aplus10 = A + 10;
@@ -65,19 +84,31 @@ int main() {
         matrix tenPlusA = 10 + A;
         wypisz_fragment(tenPlusA);
 
-        std::cout << "\n--- Testowanie operator() ---\n";
-        std::cout << "A(0,0) przed: " << A(0,0) << "\n";
-        A(0,0) = 123.456;
-        std::cout << "A(0,0) po: " << A(0,0) << "\n";
+        std::cout << "\n--- Testowanie 5*A ---\n";
+        matrix fiveTimesA = 5 * A;
+        wypisz_fragment(fiveTimesA);
+
+        std::cout << "\n--- Testowanie A-3 ---\n";
+        matrix Aminus3 = A - 3;
+        wypisz_fragment(Aminus3);
+
+        std::cout << "\n--- Testowanie 10-A ---\n";
+        matrix tenMinusA = 10 - A;
+        wypisz_fragment(tenMinusA);
+
+        std::cout << "\n--- Testowanie operator() (dostęp) ---\n";
+        std::cout << "A(0,0) przed: " << A(0, 0) << "\n";
+        A(0, 0) = 123.456;
+        std::cout << "A(0,0) po: " << A(0, 0) << "\n";
 
         std::cout << "\n--- Testowanie operator+= (skalarem) ---\n";
         matrix Ap = A;
-        Ap += 3; // dodaj 3 do wszystkich elementów
+        Ap += 3;
         wypisz_fragment(Ap);
 
         std::cout << "\n--- Testowanie operator-= (skalarem) ---\n";
         matrix Am = A;
-        Am -= 2; // odejmij 2 od wszystkich elementów
+        Am -= 2;
         wypisz_fragment(Am);
 
         std::cout << "\n--- Testowanie operator*= (skalarem) ---\n";
@@ -95,32 +126,32 @@ int main() {
         Adecr--;
         wypisz_fragment(Adecr);
 
-        std::cout << "\n--- Testowanie operatora porównania == ---\n";
-        std::cout << ((A == B) ? "PRAWDA" : "FAŁSZ") << "\n";
+        std::cout << "\n--- Testowanie operator() z double ---\n";
+        matrix Adouble = A;
+        Adouble(3.7); // dodaj 3 do wszystkich elementów
+        wypisz_fragment(Adouble);
 
-        std::cout << "\n--- Testowanie operatora porównania != ---\n";
-        std::cout << ((!(A == B)) ? "PRAWDA" : "FAŁSZ") << "\n";
+        std::cout << "\n--- Testowanie operatora porównania == ---\n";
+        matrix C = A;
+        std::cout << "A == C: " << ((A == C) ? "PRAWDA" : "FAŁSZ") << "\n";
+        std::cout << "A == B: " << ((A == B) ? "PRAWDA" : "FAŁSZ") << "\n";
 
         std::cout << "\n--- Testowanie operatora > ---\n";
-        std::cout << ((A > B) ? "PRAWDA" : "FAŁSZ") << "\n";
+        matrix D(3, 3, 0.5);
+        matrix E(3, 3, 0.3);
+        std::cout << "D(0.5) > E(0.3): " << ((D > E) ? "PRAWDA" : "FAŁSZ") << "\n";
 
         std::cout << "\n--- Testowanie operatora < ---\n";
-        std::cout << ((A < B) ? "PRAWDA" : "FAŁSZ") << "\n";
+        std::cout << "E(0.3) < D(0.5): " << ((E < D) ? "PRAWDA" : "FAŁSZ") << "\n";
 
-        std::cout << "\n--- Test zabezpieczeń (try-catch) ---\n";
-        try {
-            matrix C(2, 2, 1.0);
-            matrix wynik = A * C; // jeśli wymiary nie pasują, powinien być wyjątek
-            wypisz_fragment(wynik);
-        } catch (const std::exception& e) {
-            std::cout << "Złapano wyjątek: " << e.what() << "\n";
-        }
+        std::cout << "\n--- Wypisywanie     macierzy A (operator<<) ---\n";
+        std::cout << A;
+
+        std::cout << "\n=== KONIEC TESTÓW ===\n";
+        return 0;
 
     } catch (const std::exception& e) {
         std::cerr << "Błąd krytyczny: " << e.what() << std::endl;
         return 1;
     }
-
-    std::cout << "\n--- KONIEC TESTÓW ---\n";
-    return 0;
 }

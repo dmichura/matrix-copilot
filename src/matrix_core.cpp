@@ -33,14 +33,55 @@ matrix::matrix(std::initializer_list<std::initializer_list<double>> init)
     }
 }
 
+// Konstruktor kopiujący
+matrix::matrix(const matrix& other) 
+    : rows(other.rows), cols(other.cols) {
+    alokuj(rows * cols);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            data[i][j] = other.data[i][j];
+        }
+    }
+}
+
+// Operator przypisania
+matrix& matrix::operator=(const matrix& other) {
+    if (this == &other) {
+        return *this;
+    }
+    
+    // Zwolnij starą pamięć
+    data.reset();
+    
+    rows = other.rows;
+    cols = other.cols;
+    
+    alokuj(rows * cols);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            data[i][j] = other.data[i][j];
+        }
+    }
+    
+    return *this;
+}
+
 void matrix::alokuj(std::size_t /*n*/) {
-    data = new double*[rows];
-    for (std::size_t i = 0; i < static_cast<std::size_t>(rows); ++i) {
+    data = std::make_unique<double*[]>(rows);
+    for (int i = 0; i < rows; ++i) {
         data[i] = new double[cols];
     }
-    for (std::size_t i = 0; i < static_cast<std::size_t>(rows); ++i) {
-        for (std::size_t j = 0; j < static_cast<std::size_t>(cols); ++j) {
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
             data[i][j] = 0.0;
         }
     }
+}
+
+double& matrix::operator()(std::size_t r, std::size_t c) {
+    return data[r][c];
+}
+
+double matrix::operator()(std::size_t r, std::size_t c) const {
+    return data[r][c];
 }
