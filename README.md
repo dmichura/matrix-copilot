@@ -29,6 +29,7 @@ Aplikacja to autorska implementacja klasy macierzy kwadratowej (**Matrix**) w j�
 │   ├── matrix_operators.cpp   # ➕ Przeciążenia operatorów (+, -, *, ==, <<)
 │   └── matrix_utils.cpp       # 🛠 Metody narzędziowe (losowanie, transpozycja, wzory)
 │
+├── Doxyfile               
 ├── doxygen.pdf                # Dokumentacja doxygen
 ├── dokumentacja.pdf           # Dokumentacja LaTeX
 ├── run.sh                     # 🐧 Skrypt uruchamiający (Linux/macOS)
